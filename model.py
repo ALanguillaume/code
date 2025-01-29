@@ -6,6 +6,12 @@ class Batch:
         self.quantity = quantity
         self.eta = eta
 
+    def can_allocate(self, line):
+        if self.quantity >= line.quantity:
+            return True
+        else:
+            return False
+
     def allocate(self, line):
         self.quantity = self.quantity - line.quantity
         return self
