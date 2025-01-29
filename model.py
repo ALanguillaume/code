@@ -13,8 +13,11 @@ class Batch:
             return False
 
     def allocate(self, line):
-        self.quantity = self.quantity - line.quantity
-        return self
+        if self.can_allocate(line):
+            self.quantity = self.quantity - line.quantity
+            return self
+        else:
+            raise ValueError("Cannot allocate more than available quantity")
 
 
 class OrderLine:

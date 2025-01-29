@@ -45,6 +45,14 @@ def test_can_allocate_if_available_equal_to_required():
     assert batch.can_allocate(line)
 
 
+def test_raise_exception_if_allocate_while_available_smaller_than_required():
+    small_batch, large_line = make_batch_and_line(
+        sku="FANCY-LAMP", batch_qty=20, line_qty=40
+    )
+    with pytest.raises(ValueError) as exc_info:
+        small_batch.allocate(large_line)
+    assert exc_info.type is ValueError
+    assert exc_info.value.args[0] == "Cannot allocate more than available quantity"
 
 
 # def test_prefers_warehouse_batches_to_shipments():
