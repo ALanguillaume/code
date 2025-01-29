@@ -8,10 +8,17 @@ tomorrow = today + timedelta(days=1)
 later = tomorrow + timedelta(days=10)
 
 
-def test_allocating_to_a_batch_reduces_the_available_quantity():
-    batch = Batch(ref="batch-001", sku="SMALL-TABLE", quantity=20, eta=today)
-    line = OrderLine(order_ref="order-ref", sku="SMALL-TABLE", quantity=2)
+def make_batch_and_line(sku, batch_qty, line_qty):
+    return (
+        Batch(ref="batch-001", sku=sku, quantity=batch_qty, eta=today),
+        OrderLine(order_ref="order-123", sku=sku, quantity=line_qty)
+    )
 
+
+def test_allocating_to_a_batch_reduces_the_available_quantity():
+    batch, line = make_batch_and_line(
+        sku="FANCY-LAMP", batch_qty=20, line_qty=2
+    )
     batch.allocate(line)
 
     assert batch.quantity == 18
