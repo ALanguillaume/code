@@ -7,10 +7,7 @@ class Batch:
         self.eta = eta
 
     def can_allocate(self, line):
-        if self.quantity >= line.quantity:
-            return True
-        else:
-            return False
+        return self.quantity >= line.quantity and self.sku == line.sku
 
     def allocate(self, line):
         if self.can_allocate(line):
