@@ -1,3 +1,13 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class OrderLine:
+    order_ref: str
+    sku: str
+    quantity: int
+
+
 class Batch:
 
     def __init__(self, ref, sku, quantity, eta):
@@ -15,11 +25,3 @@ class Batch:
             return self
         else:
             raise ValueError("Cannot allocate more than available quantity")
-
-
-class OrderLine:
-
-    def __init__(self, order_ref, sku, quantity):
-        self.order_ref = order_ref
-        self.sku = sku
-        self.quantity = quantity
