@@ -13,15 +13,25 @@ class Batch:
     def __init__(self, ref, sku, quantity, eta):
         self.ref = ref
         self.sku = sku
-        self.quantity = quantity
+        self._purchased_quantity = quantity
+        self._allocations = set()
         self.eta = eta
-
-    def can_allocate(self, line):
-        return self.quantity >= line.quantity and self.sku == line.sku
 
     def allocate(self, line):
         if self.can_allocate(line):
-            self.quantity = self.quantity - line.quantity
-            return self
-        else:
-            raise ValueError("Cannot allocate more than available quantity")
+            self._allocations.add(line)
+
+    def deallocate(self, line):
+        if line in self._allocations:
+            self._allocations.remove(line)
+
+    @property
+    def allocated_quantity(self) -> int:
+        return sum(line.quantity for line in self._allocations)
+
+    @property
+    def available_quantity(self) -> int:
+        return self._purchased_quantity - self.allocated_quantity
+
+    def can_allocate(self, line):
+        return self.available_quantity >= line.quantity and self.sku == line.sku

@@ -20,8 +20,7 @@ def test_allocating_to_a_batch_reduces_the_available_quantity():
         sku="FANCY-LAMP", batch_qty=20, line_qty=2
     )
     batch.allocate(line)
-
-    assert batch.quantity == 18
+    assert batch.available_quantity == 18
 
 
 def test_can_allocate_if_available_greater_than_required():
@@ -45,20 +44,17 @@ def test_can_allocate_if_available_equal_to_required():
     assert batch.can_allocate(line)
 
 
-def test_raise_exception_if_allocate_while_available_smaller_than_required():
-    small_batch, large_line = make_batch_and_line(
-        sku="FANCY-LAMP", batch_qty=20, line_qty=40
-    )
-    with pytest.raises(ValueError) as exc_info:
-        small_batch.allocate(large_line)
-    assert exc_info.type is ValueError
-    assert exc_info.value.args[0] == "Cannot allocate more than available quantity"
-
-
 def test_cannot_allocate_if_skus_do_not_match():
     batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta=today)
     different_sku_line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10)
     assert batch.can_allocate(different_sku_line) is False
+
+
+def test_can_only_deallocate_allocated_lines():
+    batch, unallocated_line = make_batch_and_line("DECORATIVE-TRINKET", 20, 2)
+    batch.deallocate(unallocated_line)
+    assert batch._allocations == set()
+    assert batch.available_quantity == 20
 
 # def test_prefers_warehouse_batches_to_shipments():
 #     pytest.fail("todo")
