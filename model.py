@@ -18,6 +18,24 @@ class Batch:
         self._allocations = set()
         self.eta = eta
 
+    def __repr__(self):
+        return f"<Batch {self.reference}>"
+
+    def __eq__(self, other):
+        if not isinstance(other, Batch):
+            return False
+        return other.reference == self.reference
+
+    def __hash__(self):
+        return hash(self.reference)
+
+    def __gt__(self, other):
+        if self.eta is None:
+            return False
+        if other.eta is None:
+            return True
+        return self.eta > other.eta
+
     def allocate(self, line):
         if self.can_allocate(line):
             self._allocations.add(line)
@@ -36,24 +54,6 @@ class Batch:
 
     def can_allocate(self, line):
         return self.available_quantity >= line.quantity and self.sku == line.sku
-
-    def __eq__(self, other):
-        if not isinstance(other, Batch):
-            return False
-        return other.reference == self.reference
-
-    def __hash__(self):
-        return hash(self.reference)
-
-    def __gt__(self, other):
-        if self.eta is None:
-            return False
-        if other.eta is None:
-            return True
-        return self.eta > other.eta
-
-    def __repr__(self):
-        return f"<Batch {self.reference}>"
 
 
 def allocate(line: OrderLine, batches: List[Batch]) -> str:
