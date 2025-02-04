@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -11,7 +12,7 @@ class OrderLine:
 class Batch:
 
     def __init__(self, ref, sku, quantity, eta):
-        self.ref = ref
+        self.reference = ref
         self.sku = sku
         self._purchased_quantity = quantity
         self._allocations = set()
@@ -35,3 +36,27 @@ class Batch:
 
     def can_allocate(self, line):
         return self.available_quantity >= line.quantity and self.sku == line.sku
+
+    def __eq__(self, other):
+        if not isinstance(other, Batch):
+            return False
+        return other.reference == self.reference
+
+    def __hash__(self):
+        return hash(self.reference)
+
+    def __gt__(self, other):
+        if self.eta is None:
+            return False
+        if other.eta is None:
+            return True
+        return self.eta > other.eta
+
+    def __repr__(self):
+        return f"<Batch {self.reference}>"
+
+
+def allocate(line: OrderLine, batches: List[Batch]) -> str:
+    batch = next(b for b in sorted(batches) if b.can_allocate(line))
+    batch.allocate(line)
+    return batch.reference
